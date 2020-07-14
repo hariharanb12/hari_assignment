@@ -1,0 +1,28 @@
+version: '3.4'
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - "/tmp/servicemonitor/dbdata:/home/flasky/data"
+    depends_on:
+      - eshost
+    healthcheck:
+      test: ["CMD", "curl", "-k", "https://localhost:5000/add"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+  eshost:
+    image: "elasticsearch:7.8.0"
+    environment:
+      - discovery.type=single-node
+    volumes:
+      - "/tmp/servicemonitor/esdata:/usr/share/elasticsearch/data"
+    healthcheck:
+      test: ["CMD", "curl", "-v", "http://localhost:9300"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s

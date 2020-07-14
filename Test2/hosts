@@ -1,0 +1,11 @@
+[webserver]
+host1
+
+[appserver]
+host2
+
+[dbserver]
+host3
+
+[apiserver]
+localhost

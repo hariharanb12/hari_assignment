@@ -1,0 +1,50 @@
+---
+- name: Play for installing webserver package
+  hosts: webserver
+  become: yes
+  tasks:
+    - name: ensure {{ webpackage }} package is installed
+      yum:
+        name: "{{ webpackage }}"
+        state: present
+      when: action == "verify_install"
+
+    - name: Ensure {{ webservice }} is enabled
+      service:
+        name: "{{ webserver }}"
+        enabled: true
+        state: started
+      when: action == "verify_install"
+
+- name: call to the api service to verify App status
+  hosts: apiserver
+  tasks:
+    - name: check if the response contains DOWN
+      uri:
+        url: "{{ apiservice }}"
+        return_content: yes
+        validate_certs: no
+      register: this
+      failed_when: '"DOWN" in this.content'
+      when: action == "check_status"
+
+- name: Play for monitoring and alerting on disk space usage
+  hosts: all
+  vars:
+    smtp_host: "<smtp-host>"
+    smtp_port: "<smtp-port>"
+    smtp_username: "<smtp-username>"
+    smtp_password: "<smtp-password>"
+  tasks:
+    - name: send email to the team
+      mail:
+        host: "{{ smtp_host }}"
+        port: " {{ smtp_port }}"
+        username: "{{ smtp_username }}"
+        password: "{{ smtp_password }}"
+        to: nhariha1@gmail.com
+        subject: Ansible-report
+        body: " {{ item.mount }} in System {{ ansible_hostname }}  with more than 80% disk space consumed "
+      delegate_to: 127.0.0.1
+      with_items: "{{ ansible_mounts }}"
+      when: action == "check_disk" and item.size_available < item.size_total|float * 0.2
