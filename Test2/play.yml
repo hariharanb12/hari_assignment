@@ -16,7 +16,7 @@
         state: started
       when: action == "verify_install"
 
-- name: call to the api service to verify App status
+- name: Play to call the api service to verify App status
   hosts: apiserver
   tasks:
     - name: check if the response contains DOWN

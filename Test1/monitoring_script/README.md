@@ -25,11 +25,13 @@ postgresql-11-status-20200704045001.json
 
 rabbitmq-server-status-20200704045001.json
 
-The program logs are stored in /var/log/appmonitor/monitor.log
+The program logs are stored in `/var/log/appmonitor/monitor.log`
 
 ### Tests:
 
 Unittests are in app_monitor_test.py
+
+`python app_monitor_test.py`
 
 ### Note:
 
